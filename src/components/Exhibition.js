@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Web3Modal from 'web3modal';
 import nftMarketContractArtifact from '../artifacts/contracts/NFTMarket.sol/NFTMarket.json';
-import { Card, Button, ListGroup, ListGroupItem } from 'react-bootstrap';
+import nftContractArtifact from '../artifacts/contracts/NFT.sol/NFT.json';
+import { Card, Button, ListGroup, ListGroupItem, Row, Col } from 'react-bootstrap';
+import { nftContractAddress, nftMarketContractAddress } from '../config';
 
 function App() {
   const [nfts, setNfts] = useState([]);
@@ -16,16 +18,20 @@ function App() {
 
   const loadNFTs = async () => {
     const provider = new ethers.providers.JsonRpcProvider();
-    const nftMarketContractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
-    const contract = new ethers.Contract(
+    const nftContract = new ethers.Contract(
+      nftContractAddress,
+      nftContractArtifact.abi,
+      provider
+    );
+    const nftMarketContract = new ethers.Contract(
       nftMarketContractAddress,
       nftMarketContractArtifact.abi,
       provider
     );
-    const marketItems = await contract.fetchMarketItems();
-
+    const marketItems = await nftMarketContract.fetchMarketItems();
+    
     const formattedItems = await Promise.all(marketItems.map(async marketItem => {
-      const tokenURI = await contract.tokenURI(marketItem.tokenId);
+      const tokenURI = await nftContract.tokenURI(marketItem.tokenId);
       const meta = await axios.get(tokenURI);
       const price = ethers.utils.formatUnits(marketItem.price.toString(), 'ether');
       
@@ -81,25 +87,29 @@ function App() {
 
   return (
     <div>
+      <Row>
         {
-          nfts.map((nft, i) => {
-            <Card style={{ width: '18rem' }}>
-              <Card.Img variant="top" src={nft.image} />
-              <Card.Body>
-                <Card.Title>{nft.name}</Card.Title>
-                <Card.Text>
-                  {nft.description}
-                </Card.Text>
-              </Card.Body>
-              <ListGroup className="list-group-flush">
-                <ListGroupItem>{nft.price} ETH</ListGroupItem>
-              </ListGroup>
-              <Card.Body>
-                <Button variant="primary" onClick={() => { buyNFT(nft) }}>Buy</Button>
-              </Card.Body>
-            </Card>
-          })
+          nfts.map((nft, i) => (
+            <Col xs={6} md={4}>
+              <Card style={{ width: '18rem' }}>
+                <Card.Img variant="top" src={nft.image} />
+                <Card.Body>
+                  <Card.Title>{nft.name}</Card.Title>
+                  <Card.Text>
+                    {nft.description}
+                  </Card.Text>
+                </Card.Body>
+                <ListGroup className="list-group-flush">
+                  <ListGroupItem>{nft.price} ETH</ListGroupItem>
+                </ListGroup>
+                <Card.Body>
+                  <Button variant="primary" onClick={() => { buyNFT(nft) }}>Buy</Button>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))
         }
+      </Row>
     </div>
   );
 }
