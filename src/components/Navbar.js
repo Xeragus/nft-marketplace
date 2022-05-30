@@ -10,6 +10,7 @@ function App() {
           <Nav className="justify-content-end">
               <Nav.Link href="/">exhibition</Nav.Link>
               <Nav.Link href="/studio">studio</Nav.Link>
+              <Nav.Link href="/my-assets">my assets</Nav.Link>
               <Nav.Link href="/about">about us</Nav.Link>
           </Nav>
         </Container>

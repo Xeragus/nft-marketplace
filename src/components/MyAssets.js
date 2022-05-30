@@ -17,7 +17,10 @@ function App() {
   }, []);
 
   const loadNFTs = async () => {
-    const provider = new ethers.providers.JsonRpcProvider();
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
+    const signer = provider.getSigner();
     const nftContract = new ethers.Contract(
       nftContractAddress,
       nftContractArtifact.abi,
@@ -28,7 +31,7 @@ function App() {
       nftMarketContractArtifact.abi,
       provider
     );
-    const marketItems = await nftMarketContract.fetchMarketItems();
+    const marketItems = await nftMarketContract.fetchMyPurchasedNFTs();
     console.log(marketItems);
     const formattedItems = await Promise.all(marketItems.map(async marketItem => {
       const tokenURI = await nftContract.tokenURI(marketItem.tokenId);
@@ -50,29 +53,10 @@ function App() {
     setIsDataFetched(true);
   }
 
-  const buyNFT = async (nft) => {
-    const web3modal = new Web3Modal();
-    const connection = await web3modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(
-      nftMarketContractAddress,
-      nftMarketContractArtifact.abi,
-      signer
-    );
-    const price = ethers.utils.parseUnits(nft.price.toString(), 'ether');
-    const transaction = await contract.createMarketSale(
-      nftContractAddress, nft.tokenId, { value: price }
-    );
-    await transaction.wait();
-
-    loadNFTs();
-  }
-
   if (!isDataFetched) {
     return (
       <div>
-        Loading market items...
+        Loading artworks you own...
       </div>
     );
   }
@@ -80,17 +64,18 @@ function App() {
   if (isDataFetched && !nfts.length) {
     return (
       <div>
-        No items in marketplace
+        You don't own any art yet. See the <a href="/">Exhibition</a> and buy.
       </div>
     );
   }
 
   return (
     <div>
+        You are the owner of the following artworks:
       <Row>
         {
           nfts.map((nft, i) => (
-            <Col xs={6} md={4} key={i}>
+            <Col xs={6} md={4}>
               <Card style={{ width: '18rem' }}>
                 <Card.Img variant="top" src={nft.image} />
                 <Card.Body>
@@ -102,9 +87,6 @@ function App() {
                 <ListGroup className="list-group-flush">
                   <ListGroupItem>{nft.price} ETH</ListGroupItem>
                 </ListGroup>
-                <Card.Body>
-                  <Button variant="primary" onClick={() => { buyNFT(nft) }}>Buy</Button>
-                </Card.Body>
               </Card>
             </Col>
           ))

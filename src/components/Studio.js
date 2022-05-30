@@ -93,26 +93,6 @@ function App() {
     <Navigate replace to="/" />
   }
 
-  // const listNFTForSale = async () => {
-  //   const url = await createItem();
-  //   const web3Modal = new Web3Modal();
-  //   const connection = await web3Modal.connect();
-  //   const provider = new ethers.providers.Web3Provider(connection);
-  //   const signer = provider.getSigner();
-  //   const price = ethers.utils.parseUnits(formInput.price, 'ether');
-
-  //   const contract = new ethers.Contract(
-  //     nftMarketContractAddress,
-  //     nftMarketContractArtifact.abi,
-  //     signer
-  //   );
-  //   const transactionTax = await contract.getTax();
-  //   const transaction = await contract.createMarketItem(url, price, { value: transactionTax });
-  //   await transaction.wait();
-
-  //   <Navigate replace to="/" />
-  // }
-
   return (
     <div>
       <h1>Create & sell your artwork</h1>

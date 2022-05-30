@@ -4,6 +4,7 @@ import Exhibition from './components/Exhibition';
 import Studio from './components/Studio';
 import About from './components/About';
 import Navbar from './components/Navbar';
+import MyAssets from './components/MyAssets';
 import { Container } from 'react-bootstrap';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<Exhibition />} />
           <Route path="/studio" element={<Studio />} />
           <Route path="/about" element={<About />} />
+          <Route path="/my-assets" element={<MyAssets />} />
         </Routes>
       </div>
     </Container>
